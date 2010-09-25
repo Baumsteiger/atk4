@@ -84,9 +84,12 @@ class TMail extends AbstractController{
 		$this->set('subject',$this->template->cloneRegion('subject'));
 		// body
 		$this->body=$this->template->cloneRegion('body');
-		$this->sign=$sign=$this->body->cloneRegion('sign');
+		if($this->template->is_set('sign'))$this->sign=$this->body->cloneRegion('sign');
+
 		$this->body->tryDel('sign');
-		if($sign->render()!='')$this->sign=$sign;
+		if($this->sign->render()=='')
+			//trying to get from default template
+			$this->loadDefaultTemplate();
 		if($this->template->is_set('from'))$this->set('from',$this->template->cloneRegion('from'));
 		return $this;
 	}
@@ -144,11 +147,13 @@ class TMail extends AbstractController{
 	function getTemplateEngine(){
 		return $this->add('SMlite');
 	}
-	function loadDefaultTemplate(){
+	function loadDefaultTemplate($name='mail/mail',$type='.txt'){
 		/**
 		 * Loads default template and sets sign and headers from it
 		 */
-		$template=$this->getTemplateEngine()->loadTemplate('mail/mail','.txt');
+		$template=$this->getTemplateEngine();
+		$template->template_type='mail';
+		$template->loadTemplate($name,$type);
 		if($this->is_html)$template->set('content_type','text/html');
 		$this->sign=$template->cloneRegion('sign');
 	}
@@ -164,12 +169,12 @@ class TMail extends AbstractController{
 				date($this->api->getConfig('locale/timestamp','Y-m-d H:i:s')."\n"),null,'error');
 		}
 		//if(!isset($this->mime['text'])&&!isset($this->mime['html'])){
-			$this->setBody(is_object($this->body)?$this->body->render():$this->body);
+			$this->setBody(is_object($this->body)?$this->body->set('sign',$this->getSign())->render():$this->body);
 		//}
 		// sign should be added to all parts
 		if(isset($this->mime['text']))$this->mime['text']['content'].=$this->getSign();
 		if(isset($this->mime['html'])){
-			$this->mime['html']['content'].=$this->getSign();
+			//$this->mime['html']['content'].=$this->getSign();
 			// HTML should be converted to base 64
 			//$this->mime['html']['content']=base64_encode($this->mime['html']['content']);
 			// no, it should be splitted
