@@ -100,6 +100,12 @@ $.widget("ui.atk4_form", {
 			$(this).after(a);
 			s.remove();
 		});
+		// finding submit buttons and setting them pass their names to submit
+		this.element.find('button[type=submit]').each(function(){
+			$(this).click(function(){
+				form.submitForm($(this).attr('id'));
+			})
+		});
 		this.base_url=window.location.href.substr(0,window.location.href.indexOf('#'));
 		if(this.options.base_url)this.base_url=this.options.base_url;
     },
