@@ -44,8 +44,9 @@ abstract class Form_Field extends AbstractView {
 	}
 	function _cutField(){
 		// this method is used by ui.atk4_form, when doing reloadField();
-		echo $this->getInput();
-		exit;
+		if($this->api->jquery)$this->api->jquery->getJS($this);
+		$e=new RenderObjectSuccess($this->getInput());
+		throw $e;
 	}
 	function setMandatory($mandatory=true){
 		$this->mandatory=$mandatory;
