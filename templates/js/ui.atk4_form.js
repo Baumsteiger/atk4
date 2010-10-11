@@ -85,7 +85,7 @@ $.widget("ui.atk4_form", {
 			}
 
 			e.preventDefault();
-			form.submitForm();
+			if(!form.loading)form.submitForm();
 		});
 
 		this.element.find('.form_error').remove();
