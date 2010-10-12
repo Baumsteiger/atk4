@@ -153,9 +153,26 @@ class BasicAuth extends AbstractController {
 					return;
 				}
 			}else $this->debug("No permanent cookie");
+			$this->saveDestination($this->api->page,$_GET);
 			$this->processLogin();
 			return true;
 		}else $this->debug('User is already authenticated');
+	}
+	/**
+	 * To memorize the page user requested (with parameters)
+	 */
+	function saveDestination($page,$args){
+		if($this->recall('destination_page',false)!==false || $page==$this->api->getIndexPage())return $this;
+		$this->memorize('destination_page',$page);
+		$this->memorize('destination_args',$args);
+		return $this;
+	}
+	function getDestination(){
+		$page=$this->recall('destination_page');
+		$this->forget('destination_page');
+		$args=$this->recall('destination_args');
+		$this->forget('destination_args');
+		return array_merge(array('page'=>$page),$args);
 	}
 	function addInfo($key,$val=null){
 		if(is_null($val) && is_array($key)){
@@ -217,40 +234,13 @@ class BasicAuth extends AbstractController {
 		$this->loggedIn($username,$this->allowed_credintals[$username],$memorize);
 	}
 	function loginRedirect(){
-
-		/*
-		$this->debug("Redirecting to original page");
-		// Redirect to the page which was originally requested
-		if($original_request=$this->recall('original_request',false)){
-			$p=$original_request['page'];
-			if(!$p)$p=null;
-			unset($original_request['page']);
-			// the following parameters should not remain as thay break the page
-			unset($original_request['submit']);
-			// expanders should not be displayed, going to parent page instead
-			if(isset($original_request['expander'])){
-				$parts=split('_',$p);
-				if(count($parts)>0){
-					unset($parts[count($parts)-1]);
-					$p=join('_',$parts);
-				}
-				unset($original_request['expander']);
-				unset($original_request['expanded']);
-				unset($original_request['id']);
-			}
-			unset($original_request['cut_object']);
-			$this->debug("to $p");
-			// erasing stored URL
-			$this->forget('original_request');
-			if($this->api->isAjaxOutput())$this->ajax()->redirect($p,$original_request)->execute();
-			else $this->api->redirect($p,$original_request);
-		}
-		*/
-
-		// Rederect to index page
-		$this->debug("to Index");
-		if($this->api->isAjaxOutput())$this->ajax()->redirect($this->api->getIndexPage())->execute();
-		$this->api->redirect($this->api->getIndexPage());
+		// Redirect to original page
+		$this->debug("to Origin");
+		$dest=$this->getDestination();
+		if(!$dest)return;
+		$page=$dest['page']; unset($dest['page']);
+		if($this->api->isAjaxOutput())$this->api->js()->univ()->location($this->api->getDestinationUrl($page,$dest))->execute();
+		$this->api->redirect($page,$dest);
 	}
 	function logout(){
 		// Forces logout. This also cleans cookies
