@@ -162,7 +162,7 @@ class BasicAuth extends AbstractController {
 	 * To memorize the page user requested (with parameters)
 	 */
 	function saveDestination($page,$args){
-		if($this->recall('destination_page',false)!==false || $page==$this->api->getIndexPage())return $this;
+		if($this->recall('destination_page',false)!==false || !$this->isPageAllowed($page))return $this;
 		$this->memorize('destination_page',$page);
 		$this->memorize('destination_args',$args);
 		return $this;
@@ -297,6 +297,9 @@ class BasicAuth extends AbstractController {
 
 		return $p;
 	}
+	/**
+	 * Obsolete, use saveDestination() instead
+	 */
 	function memorizeOriginalURL(){
 		if($this->recall('original_request',false)===false)$this->memorize('original_request',$_GET);
 		return $this;
