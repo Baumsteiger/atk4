@@ -22,7 +22,7 @@ class Container extends BaseObject {
 
 
 	/////////////// C r o s s   f u n c t i o n s ///////////////
-	function downCall($type,$args=null){
+	function downCall($type,$args=array()){
 		/**
 		 * Execute handler for this element. If it's not defined, pass event to
 		 * all sub-elements. If any of the elements returns true or false value,
