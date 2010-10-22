@@ -766,6 +766,7 @@ class Grid extends CompleteLister {
 
 				if($full){
 					$header_col->set('descr',$column['descr']);
+					$header_col->trySet('type',$column['type']);
 					if(isset($column['sortable'])){
 						$s=$column['sortable'];
 						// calculate sortlink
