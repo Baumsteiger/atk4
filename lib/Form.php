@@ -112,7 +112,7 @@ class Form extends AbstractView {
 	function addField($type,$name,$caption=null,$attr=null){
 		if($caption===null)$caption=ucwords(str_replace('_',' ',$name));
 
-		$last_field=$this->add('Form_Field_'.$type,$name,'form_body','form_line')
+		$this->last_field=$last_field=$this->add('Form_Field_'.$type,$name,'form_body','form_line')
 			->setCaption($caption);
 		if (is_array($attr)){
 			foreach ($attr as $key => $value){
