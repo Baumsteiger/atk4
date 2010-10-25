@@ -170,7 +170,7 @@ class BasicAuth extends AbstractController {
 	function getDestination(){
 		$page=$this->recall('destination_page');
 		$this->forget('destination_page');
-		$args=$this->recall('destination_args');
+		$args=$this->recall('destination_args',array());
 		$this->forget('destination_args');
 		return array_merge(array('page'=>$page),$args);
 	}
